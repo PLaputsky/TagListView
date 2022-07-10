@@ -170,7 +170,7 @@ open class TagListView: UIView {
         }
     }
     
-    @IBInspectable open dynamic var removeButtonIconSize: CGFloat = 12 {
+    @IBInspectable open dynamic var removeButtonIconSize: CGFloat = 6 {
         didSet {
             defer { rearrangeViews() }
             tagViews.forEach {
@@ -178,7 +178,7 @@ open class TagListView: UIView {
             }
         }
     }
-    @IBInspectable open dynamic var removeIconLineWidth: CGFloat = 1 {
+    @IBInspectable open dynamic var removeIconLineWidth: CGFloat = 2 {
         didSet {
             defer { rearrangeViews() }
             tagViews.forEach {
@@ -187,11 +187,20 @@ open class TagListView: UIView {
         }
     }
     
-    @IBInspectable open dynamic var removeIconLineColor: UIColor = UIColor.white.withAlphaComponent(0.54) {
+    @IBInspectable open dynamic var removeIconLineColor: UIColor = UIColor.white {
         didSet {
             defer { rearrangeViews() }
             tagViews.forEach {
                 $0.removeIconLineColor = removeIconLineColor
+            }
+        }
+    }
+    
+    @IBInspectable open dynamic var removeButtonBackgroundColor: UIColor = .gray {
+        didSet {
+            defer { rearrangeViews() }
+            tagViews.forEach {
+                $0.removeButtonBackgroundColor = removeButtonBackgroundColor
             }
         }
     }
@@ -318,6 +327,8 @@ open class TagListView: UIView {
             }
             currentRowView.frame.size.width = currentRowWidth
             currentRowView.frame.size.height = max(tagViewHeight, currentRowView.frame.height)
+            
+            tagView.clipsToBounds = false
         }
         rows = currentRow
         
@@ -350,12 +361,12 @@ open class TagListView: UIView {
         tagView.paddingX = paddingX
         tagView.paddingY = paddingY
         tagView.textFont = textFont
-        tagView.removeIconLineWidth = removeIconLineWidth
-        tagView.removeButtonIconSize = removeButtonIconSize
         tagView.enableRemoveButton = enableRemoveButton
+        tagView.removeButtonBackgroundColor = removeButtonBackgroundColor
         tagView.removeIconLineColor = removeIconLineColor
         tagView.addTarget(self, action: #selector(tagPressed(_:)), for: .touchUpInside)
         tagView.removeButton.addTarget(self, action: #selector(removeButtonPressed(_:)), for: .touchUpInside)
+        tagView.clipsToBounds = false
         
         // On long press, deselect all tags except this one
         tagView.onLongPress = { [unowned self] this in

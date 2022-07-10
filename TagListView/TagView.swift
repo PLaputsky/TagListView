@@ -10,13 +10,25 @@ import UIKit
 
 @IBDesignable
 open class TagView: UIButton {
-
     @IBInspectable open var cornerRadius: CGFloat = 0 {
         didSet {
             layer.cornerRadius = cornerRadius
             layer.masksToBounds = cornerRadius > 0
         }
     }
+    
+    @IBInspectable open var removeButtonRadius: CGFloat = 8 {
+        didSet {
+            crossOvalView.layer.cornerRadius = removeButtonRadius
+        }
+    }
+    
+    @IBInspectable open var removeButtonBackgroundColor: UIColor = .gray {
+        didSet {
+            crossOvalView.backgroundColor = removeButtonBackgroundColor
+        }
+    }
+    
     @IBInspectable open var borderWidth: CGFloat = 0 {
         didSet {
             layer.borderWidth = borderWidth
@@ -39,21 +51,24 @@ open class TagView: UIButton {
             reloadStyles()
         }
     }
+    
     @IBInspectable open var titleLineBreakMode: NSLineBreakMode = .byTruncatingMiddle {
         didSet {
             titleLabel?.lineBreakMode = titleLineBreakMode
         }
     }
+    
     @IBInspectable open var paddingY: CGFloat = 2 {
         didSet {
             titleEdgeInsets.top = paddingY
             titleEdgeInsets.bottom = paddingY
         }
     }
+    
     @IBInspectable open var paddingX: CGFloat = 5 {
         didSet {
             titleEdgeInsets.left = paddingX
-            updateRightInsets()
+            titleEdgeInsets.right = paddingX
         }
     }
 
@@ -84,6 +99,23 @@ open class TagView: UIButton {
     @IBInspectable open var textFont: UIFont = .systemFont(ofSize: 12) {
         didSet {
             titleLabel?.font = textFont
+        }
+    }
+    
+    @IBInspectable open var removeButtonIconSize: CGFloat = 6 {
+        didSet {
+            crossOvalView.iconSize = removeButtonIconSize
+        }
+    }
+    
+    @IBInspectable open var removeIconLineWidth: CGFloat = 2 {
+        didSet {
+            crossOvalView.lineWidth = removeIconLineWidth
+        }
+    }
+    @IBInspectable open var removeIconLineColor: UIColor = UIColor.white.withAlphaComponent(0.54) {
+        didSet {
+            crossOvalView.lineColor = removeIconLineColor
         }
     }
     
@@ -122,30 +154,14 @@ open class TagView: UIButton {
     // MARK: remove button
     
     let removeButton = CloseButton()
+    let crossOvalView = OvalCrossView()
     
     @IBInspectable open var enableRemoveButton: Bool = false {
         didSet {
             removeButton.isHidden = !enableRemoveButton
-            updateRightInsets()
+            crossOvalView.isHidden = !enableRemoveButton
             removeButton.setNeedsDisplay()
-        }
-    }
-    
-    @IBInspectable open var removeButtonIconSize: CGFloat = 12 {
-        didSet {
-            removeButton.iconSize = removeButtonIconSize
-            updateRightInsets()
-        }
-    }
-    
-    @IBInspectable open var removeIconLineWidth: CGFloat = 3 {
-        didSet {
-            removeButton.lineWidth = removeIconLineWidth
-        }
-    }
-    @IBInspectable open var removeIconLineColor: UIColor = UIColor.white.withAlphaComponent(0.54) {
-        didSet {
-            removeButton.lineColor = removeIconLineColor
+            crossOvalView.setNeedsDisplay()
         }
     }
     
@@ -172,6 +188,7 @@ open class TagView: UIButton {
         titleLabel?.lineBreakMode = titleLineBreakMode
 
         frame.size = intrinsicContentSize
+        addSubview(crossOvalView)
         addSubview(removeButton)
         removeButton.tagView = self
         
@@ -192,29 +209,25 @@ open class TagView: UIButton {
         if size.width < size.height {
             size.width = size.height
         }
-        if enableRemoveButton {
-            size.width += removeButtonIconSize + paddingX
-        }
+        
         return size
-    }
-    
-    private func updateRightInsets() {
-        if enableRemoveButton {
-            titleEdgeInsets.right = paddingX  + removeButtonIconSize + paddingX
-        }
-        else {
-            titleEdgeInsets.right = paddingX
-        }
     }
     
     open override func layoutSubviews() {
         super.layoutSubviews()
-        if enableRemoveButton {
-            removeButton.frame.size.width = paddingX + removeButtonIconSize + paddingX
-            removeButton.frame.origin.x = self.frame.width - removeButton.frame.width
-            removeButton.frame.size.height = self.frame.height
-            removeButton.frame.origin.y = 0
-        }
+        
+        crossOvalView.frame.size.width = removeButtonRadius * 2
+        crossOvalView.frame.size.height = removeButtonRadius * 2
+        crossOvalView.frame.origin.x = frame.width - removeButtonRadius - 4
+        crossOvalView.frame.origin.y = 0 - removeButtonRadius + 4
+        crossOvalView.layer.cornerRadius = removeButtonRadius
+        crossOvalView.backgroundColor = removeButtonBackgroundColor
+        crossOvalView.lineColor = removeIconLineColor
+        crossOvalView.clipsToBounds = true
+        
+        let offset: UIEdgeInsets = .init(top: -4, left: -16, bottom: -16, right: -4)
+        removeButton.frame = crossOvalView.frame.inset(by: offset)
+        removeButton.backgroundColor = .clear
     }
 }
 

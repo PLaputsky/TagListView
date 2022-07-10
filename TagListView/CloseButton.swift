@@ -9,12 +9,13 @@
 import UIKit
 
 internal class CloseButton: UIButton {
-
-    var iconSize: CGFloat = 10
-    var lineWidth: CGFloat = 1
-    var lineColor: UIColor = UIColor.white.withAlphaComponent(0.54)
-
     weak var tagView: TagView?
+}
+
+internal class OvalCrossView: UIView {
+    var iconSize: CGFloat = 6
+    var lineWidth: CGFloat = 2
+    var lineColor: UIColor = .white
 
     override func draw(_ rect: CGRect) {
         let path = UIBezierPath()
@@ -38,5 +39,4 @@ internal class CloseButton: UIButton {
 
         path.stroke()
     }
-
 }
